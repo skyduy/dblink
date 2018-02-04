@@ -1,0 +1,13 @@
+
+.idea/
+build
+dist
+*.egg-info
+*.eggs
+*.egg
+__pycache__
+*.sqlite3
+*.swp
+*.pyc
+.DS_Store
+.vscode
