@@ -1,5 +1,6 @@
 # dblink
 
+[![PyPI version](https://badge.fury.io/py/dblink.svg)](https://badge.fury.io/py/dblink)
 [![Build Status](https://travis-ci.org/skyduy/dblink.svg?branch=master)](https://travis-ci.org/skyduy/dblink)
 [![codecov](https://codecov.io/gh/skyduy/dblink/branch/master/graph/badge.svg)](https://codecov.io/gh/skyduy/dblink)
 
