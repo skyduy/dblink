@@ -64,7 +64,7 @@ with SADB('sqlite:///:memory:') as db:
     table_user.join(table_address) \
               .filter(id__lt=10000) \
               .filter(email_address__contains='gmail') \
-              .filter(**{'table_address.id__gte': 100}) \
+              .filter(**{'addresses.id__gte': 100}) \
               .values_list('user_id', 'name', 'email_address',
                            table_address.id, 'users.fullname')
 
