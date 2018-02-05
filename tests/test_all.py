@@ -1,5 +1,5 @@
 from unittest import TestCase
-from sqlamodel import SADB, SATable
+from dblink import SADB, SATable
 from tests import create_table, drop_table
 
 
@@ -217,7 +217,6 @@ class QueryTest(TestCase):
     def test_F_delete(self):
         items = self.user_table.query.filter(id=1)
         delete_count = items.delete()
-        print('{} records has been deleted'.format(delete_count))
         self.assertEqual(delete_count, 1)
         self.assertEqual(self.user_table.query.all(),
                          [(2, 'n2', 'f2', 'p2')])

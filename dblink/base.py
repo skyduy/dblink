@@ -3,12 +3,11 @@ import logging
 import sqlalchemy as sal
 from functools import wraps
 from sqlalchemy.exc import DBAPIError
-from sqlalchemy.pool import NullPool
 from sqlalchemy.sql.expression import bindparam
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.sql import operators, extract
-from sqlamodel.exceptions import (
+from dblink.exceptions import (
     NoColumns, DuplicateColumns, UnexpectedParam, NoTableError,
 )
 
@@ -342,8 +341,9 @@ class SAQuery:
                     raise KeyError(msg)
             if op == 'in' and len(value) > self.WARNING_LEN and \
                     self.session.bind.dialect.name == 'mysql':
-                logger.warning('In clause is longer than {}, may cause '
-                            'MySQL server gone away.'.format(self.WARNING_LEN))
+                msg = 'In clause is longer than {}, may cause ' \
+                      'MySQL server gone away.'.format(self.WARNING_LEN)
+                logger.warning(msg)
             op_func = self._underscore_operators[op]
             conditions.append(op_func(self._parse_column(name), value))
         return conditions

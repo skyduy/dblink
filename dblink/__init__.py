@@ -1,4 +1,4 @@
-from sqlamodel.base import SADB, SATable
+from dblink.base import SADB, SATable
 
 
 __all__ = [
