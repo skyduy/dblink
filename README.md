@@ -1,4 +1,5 @@
-# DB link tools
+# dblink
+[![Build Status](https://travis-ci.org/skyduy/dblink.svg?branch=master)](https://travis-ci.org/skyduy/dblink)
 
 > Aimed for easily using query, insert, update and delete with an exist table, the filter query syntax likes Django's. You can find out the simple usage in the code below.
 
@@ -11,7 +12,7 @@ CREATE TABLE users (
     fullname VARCHAR(50),
     password VARCHAR(12),
     PRIMARY KEY (id)
-)
+);
 
 CREATE TABLE addresses (
     id INTEGER NOT NULL,
@@ -19,7 +20,7 @@ CREATE TABLE addresses (
     user_id INTEGER,
     PRIMARY KEY (id),
     FOREIGN KEY(user_id) REFERENCES users (id)
-)
+);
 ```
 
 You can link to exist table in database using [Database Urls](http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls).
