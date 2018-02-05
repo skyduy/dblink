@@ -12,7 +12,7 @@ from dblink.exceptions import (
 )
 
 
-logger = logging.getLogger('dblink')
+logger = logging.getLogger('DBLink')
 logger.setLevel(logging.WARNING)
 ch = logging.StreamHandler()
 formatter = logging.Formatter(
