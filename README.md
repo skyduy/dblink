@@ -58,9 +58,19 @@ with SADB('sqlite:///:memory:') as db:
 
     # chain query, you can call delete on the single table result
     table_user.query.filter(id=1).one_or_none()
-    table_user.query.filter(id__gte=2).values_list('id', 'name')    # generator
+
+    table_user.query.filter(id__gte=2) \
+                    .order_by('name') \
+                    .values_list('id', 'name')
+
     table_user.query.filter(id__in=[1, 2, 3]) \
                     .filter(name__startswith='Yu').all()
+
+    table_user.query.order_by('-name') \
+                    .values_list('fullname', flat=True, distinct=True)
+
+    table_user.query.distinct('name').values_list('name', flat=True)
+
     table_user.query.filter(id__in=[1, 2, 3]).delete()
 
     # join query
@@ -79,6 +89,12 @@ with SADB('sqlite:///:memory:') as db:
 
     table_user.update({'id': 1, 'name': 'skyduy', 'password': 'psw'},
                       unique_fields=['id'], update_fields=['name', 'password'])
+
+    table_user.insert_or_update(
+        {'id': 1, 'name': 'skyduy', 'password': 'psw'},
+        unique_fields=['id'], update_fields=['name', 'password']
+    )
+
     table_user.delete({'id': 1, 'name': "I don't matter"},
                       unique_fields=['id'])
 

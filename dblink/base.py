@@ -149,23 +149,24 @@ class SATable:
             instance, create = self.query.filter(**kwargs).one(), True
         return instance, create
 
-    def insert(self, data):
-        if not data:
+    def insert(self, item):
+        if not item:
             return
-        return self.bulk_insert([data])
+        return self.bulk_insert([item])
 
-    def delete(self, data, unique_fields):
-        if not data:
+    def delete(self, item, unique_fields):
+        if not item:
             return
-        return self.bulk_delete([data], unique_fields)
+        return self.bulk_delete([item], unique_fields)
 
-    def update(self, data, unique_fields, update_fields):
-        if not data:
+    def update(self, item, unique_fields, update_fields):
+        if not item:
             return
-        return self.bulk_update([data], unique_fields, update_fields)
+        return self.bulk_update([item], unique_fields, update_fields)
 
-    def update_or_insert(self, values, key, update_fields=None):
-        return self.bulk_update_or_insert(values, [key], update_fields)
+    def insert_or_update(self, item, unique_fields, update_fields):
+        return self.bulk_insert_or_update(
+            [item], unique_fields, update_fields)
 
     @with_transaction
     def bulk_insert(self, data):
@@ -214,7 +215,7 @@ class SATable:
         return self.session.execute(stmt, new_data)
 
     @with_transaction
-    def bulk_update_or_insert(self, data, unique_fields, update_fields):
+    def bulk_insert_or_update(self, data, unique_fields, update_fields):
         if not data:
             return
         unique_fields, update_fields = set(unique_fields), set(update_fields)

@@ -35,6 +35,25 @@ class CoreTest(TestCase):
             self.assertEqual(answer, right)
             drop_table(db.engine)
 
+    def test_B_insert_or_update(self):
+        with SADB('sqlite:///:memory:') as db:
+            create_table(db.engine)
+            user_table = SATable('users', db)
+
+            data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
+            user_table.insert_or_update(data, ['id'], ['name', 'password'])
+            result = user_table.query.one()
+            answer = {c: getattr(result, c) for c in data.keys()}
+            self.assertEqual(answer, data)
+
+            data2 = {'id': 1, 'name': 'n', 'fullname': 'f', 'password': 'p'}
+            user_table.insert_or_update(data2, ['id'], ['name', 'password'])
+            result = user_table.query.one()
+            right = {'id': 1, 'name': 'n', 'fullname': 'f1', 'password': 'p'}
+            answer = {c: getattr(result, c) for c in right.keys()}
+            self.assertEqual(answer, right)
+            drop_table(db.engine)
+
     def test_C_bulk_insert(self):
         with SADB('sqlite:///:memory:') as db:
             create_table(db.engine)
@@ -88,7 +107,7 @@ class CoreTest(TestCase):
                 {'id': 1, 'name': 'n', 'fullname': 'f', 'password': 'p'},
                 {'id': 2, 'name': 'n2', 'fullname': 'f2', 'password': 'p2'},
             ]
-            user_table.bulk_update_or_insert(data2, ['id'],
+            user_table.bulk_insert_or_update(data2, ['id'],
                                              ['name', 'fullname', 'password'])
             results = user_table.query.all()
             answer = sorted([
@@ -190,8 +209,8 @@ class QueryTest(TestCase):
         self.assertEqual(tuple(answer), (1, 'n1'))
 
     def test_D_values_list(self):
-        answer = self.user_table.query.filter(id__gte=1).values_list(
-            'id', 'name')
+        answer = self.user_table.query.filter(id__gte=1) \
+                                .values_list('id', 'name')
         self.assertEqual(sorted(answer),
                          [(1, 'n1'), (2, 'n2')])
 
@@ -220,3 +239,24 @@ class QueryTest(TestCase):
         self.assertEqual(delete_count, 1)
         self.assertEqual(self.user_table.query.all(),
                          [(2, 'n2', 'f2', 'p2')])
+
+    def test_G_order_by(self):
+        answer = self.user_table.query.order_by('-id') \
+                                      .values_list('id', 'name')
+        self.assertEqual(list(answer), [(2, 'n2'), (1, 'n1')])
+
+    def test_H_distinct(self):
+        answer = self.address_table.query.distinct('user_id') \
+                                         .values_list('user_id', flat=True)
+        self.assertEqual(sorted(answer), [1, 2])
+        answer = self.address_table \
+                     .query.values_list('user_id', distinct=True, flat=True)
+        self.assertEqual(sorted(answer), [1, 2])
+
+    def test_I_text_query(self):
+        result = self.user_table.query.filter('users.id > 1').all()
+        self.assertEqual(result, [(2, 'n2', 'f2', 'p2')])
+
+    def test_others(self):
+        print(self.user_table.description)
+        self.assertEqual(self.db.dialect, 'sqlite')
