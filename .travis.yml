@@ -6,7 +6,10 @@ python:
 
 install:
   - pip install -r requirements.txt
-  - pip install pytest pytest-cov
+  - pip install pytest pytest-cov codecov
 
 script:
   - pytest --cov=./dblink tests
+
+after_success:
+  - codecov

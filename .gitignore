@@ -11,3 +11,5 @@ __pycache__
 *.pyc
 .DS_Store
 .vscode
+.coverage
+coverage.xml
