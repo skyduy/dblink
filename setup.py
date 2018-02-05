@@ -12,7 +12,7 @@ def read(fn):
 
 setup(
     name='dblink',
-    version='0.1.0',
+    version='0.1.1',
     description='DBLink tools makes operation on exists table easier.',
     long_description=read('README.md') + '\n\n' + read('HISTORY.md'),
     author='skyduy',
