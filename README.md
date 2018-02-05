@@ -1,5 +1,7 @@
 # dblink
+
 [![Build Status](https://travis-ci.org/skyduy/dblink.svg?branch=master)](https://travis-ci.org/skyduy/dblink)
+[![codecov](https://codecov.io/gh/skyduy/dblink/branch/master/graph/badge.svg)](https://codecov.io/gh/skyduy/dblink)
 
 > Aimed for easily using query, insert, update and delete with an exist table, the filter query syntax likes Django's. You can find out the simple usage in the code below.
 
