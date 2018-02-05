@@ -38,7 +38,7 @@ def with_transaction(f):
     return wrapper
 
 
-class SADB:
+class Database:
     def __init__(self, url):
         self.__engine = sal.create_engine(url, pool_pre_ping=True)
         self.__metadata = sal.MetaData(bind=self.__engine)
@@ -64,7 +64,7 @@ class SADB:
 
     @property
     def name(self):
-        return self.__db_conf['dbname']
+        return self.engine.url.database
 
     @property
     def metadata(self):
@@ -82,9 +82,9 @@ class SADB:
         self.close()
 
 
-class SATable:
+class Table:
     def __init__(self, name, db):
-        if not isinstance(db, SADB) or db.open is False:
+        if not isinstance(db, Database) or db.open is False:
             msg = 'Invalid db or db has been closed'
             raise UnexpectedParam(msg)
         self.__db = db
@@ -134,7 +134,7 @@ class SATable:
             params = {'table_name2table': {self.name: self.sal_table},
                       'column_name2tables': {c.name: {self.sal_table}
                                              for c in self.columns}}
-            query_object = SAQuery(self.session, query, **params)
+            query_object = Query(self.session, query, **params)
             setattr(self, '__query_object', query_object)
         return getattr(self, '__query_object')
 
@@ -253,7 +253,7 @@ class SATable:
         return getattr(self.c, item)
 
 
-class SAQuery:
+class Query:
     WARNING_LEN = 2000
     _underscore_operators = {
         'gt': operators.gt,
@@ -290,7 +290,7 @@ class SAQuery:
         return result
 
     def join(self, table, column1=None, column2=None):
-        assert isinstance(table, SATable), UnexpectedParam
+        assert isinstance(table, Table), UnexpectedParam
         automap_base(metadata=table.db.metadata).prepare()
         right_table = table.sal_table
 
@@ -414,4 +414,4 @@ class SAQuery:
                   'table_name2table': self.table_name2table,
                   'column_name2tables': self.column_name2tables}
         params.update(**kwargs)
-        return SAQuery(**params)
+        return Query(**params)

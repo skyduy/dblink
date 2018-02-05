@@ -1,6 +1,7 @@
-from dblink.base import SADB, SATable
+from dblink.base import Database, Table
 
+__version__ = '0.1.1'
 
 __all__ = [
-    'SADB', 'SATable'
+    'Database', 'Table'
 ]

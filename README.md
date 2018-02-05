@@ -29,14 +29,14 @@ CREATE TABLE addresses (
 You can link to exist table in database using [Database Urls](http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls).
 
 ```python
-from dblink import SADB, SATable
-db = SADB(url='sqlite:///:memory:')
-user_table = SATable('users', db)
+from dblink import Database, Table
+db = Database(url='sqlite:///:memory:')
+user_table = Table('users', db)
 # ...
 db.close()
 
-with SADB(url='postgresql://scott:tiger@localhost/mydatabase') as db:
-    address_table = SATable('addresses', db)
+with Database(url='postgresql://scott:tiger@localhost/mydatabase') as db:
+    address_table = Table('addresses', db)
     # ...
 ```
 
@@ -46,12 +46,12 @@ Here is a simple example.
 """
 Suppose you have two table: users and addresses.
 """
-from dblink import SADB, SATable
+from dblink import Database, Table
 
 
-with SADB('sqlite:///:memory:') as db:
-    table_user = SATable('users', db)
-    table_address = SATable('addresses', db)
+with Database('sqlite:///:memory:') as db:
+    table_user = Table('users', db)
+    table_address = Table('addresses', db)
 
     # show description
     print(table_user.description)

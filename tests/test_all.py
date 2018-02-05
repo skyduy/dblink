@@ -1,5 +1,5 @@
 from unittest import TestCase
-from dblink import SADB, SATable
+from dblink import Database, Table
 from tests import create_table, drop_table
 
 
@@ -9,9 +9,9 @@ class CoreTest(TestCase):
         self.length = 100
 
     def test_A_insert(self):
-        with SADB('sqlite:///:memory:') as db:
+        with Database('sqlite:///:memory:') as db:
             create_table(db.engine)
-            user_table = SATable('users', db)
+            user_table = Table('users', db)
 
             data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
             user_table.insert(data)
@@ -21,9 +21,9 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_B_update(self):
-        with SADB('sqlite:///:memory:') as db:
+        with Database('sqlite:///:memory:') as db:
             create_table(db.engine)
-            user_table = SATable('users', db)
+            user_table = Table('users', db)
 
             data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
             user_table.insert(data)
@@ -36,9 +36,9 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_B_insert_or_update(self):
-        with SADB('sqlite:///:memory:') as db:
+        with Database('sqlite:///:memory:') as db:
             create_table(db.engine)
-            user_table = SATable('users', db)
+            user_table = Table('users', db)
 
             data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
             user_table.insert_or_update(data, ['id'], ['name', 'password'])
@@ -55,9 +55,9 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_C_bulk_insert(self):
-        with SADB('sqlite:///:memory:') as db:
+        with Database('sqlite:///:memory:') as db:
             create_table(db.engine)
-            user_table = SATable('users', db)
+            user_table = Table('users', db)
 
             data = [
                 {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'},
@@ -73,9 +73,9 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_D_bulk_update(self):
-        with SADB('sqlite:///:memory:') as db:
+        with Database('sqlite:///:memory:') as db:
             create_table(db.engine)
-            user_table = SATable('users', db)
+            user_table = Table('users', db)
 
             data = [
                 {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'},
@@ -97,9 +97,9 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_E_bulk_update_or_insert(self):
-        with SADB('sqlite:///:memory:') as db:
+        with Database('sqlite:///:memory:') as db:
             create_table(db.engine)
-            user_table = SATable('users', db)
+            user_table = Table('users', db)
 
             data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
             user_table.insert(data)
@@ -118,9 +118,9 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_F_delete(self):
-        with SADB('sqlite:///:memory:') as db:
+        with Database('sqlite:///:memory:') as db:
             create_table(db.engine)
-            user_table = SATable('users', db)
+            user_table = Table('users', db)
 
             data = [
                 {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'},
@@ -134,9 +134,9 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_G_bulk_delete(self):
-        with SADB('sqlite:///:memory:') as db:
+        with Database('sqlite:///:memory:') as db:
             create_table(db.engine)
-            user_table = SATable('users', db)
+            user_table = Table('users', db)
 
             data = [
                 {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'},
@@ -149,9 +149,9 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_H_get_or_insert(self):
-        with SADB('sqlite:///:memory:') as db:
+        with Database('sqlite:///:memory:') as db:
             create_table(db.engine)
-            user_table = SATable('users', db)
+            user_table = Table('users', db)
             data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
             result1, flag = user_table.get_or_insert(**data)
             result2 = user_table.query.one()
@@ -185,10 +185,10 @@ class QueryTest(TestCase):
     def setUp(self):
         self.maxDiff = None
         self.length = 100
-        self.db = SADB('sqlite:///:memory:')
+        self.db = Database('sqlite:///:memory:')
         create_table(self.db.engine)
-        self.user_table = SATable('users', self.db)
-        self.address_table = SATable('addresses', self.db)
+        self.user_table = Table('users', self.db)
+        self.address_table = Table('addresses', self.db)
         user_data, address_data = self.prepare_data()
         self.user_table.bulk_insert(user_data)
         self.address_table.bulk_insert(address_data)
