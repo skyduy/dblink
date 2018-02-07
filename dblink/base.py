@@ -22,23 +22,26 @@ ch.setLevel(logging.INFO)
 logger.addHandler(ch)
 
 
-def with_transaction(f):
-    @wraps(f)
-    def wrapper(self, *args, **kwargs):
-        try:
-            result = f(self, *args, **kwargs)
-        except DBAPIError as e:
-            msg = ' '.join(['{}']*len(e.args)).format(*e.args)
-            logger.error(msg)
-            self.session.rollback()
-            e.statement = str(e.statement)[:300]
-            e.params = str(e.params)[:300]
-            raise
-        else:
-            self.session.commit()
-            return result
+def with_transaction(commit=True):
+    def decorate(f):
+        @wraps(f)
+        def wrapper(self, *args, **kwargs):
+            try:
+                result = f(self, *args, **kwargs)
+            except DBAPIError as e:
+                msg = ' '.join(['{}'] * len(e.args)).format(*e.args)
+                logger.error(msg)
+                self.session.rollback()
+                e.statement = e.statement[:300]
+                e.params = str(e.params)[:300]
+                raise
+            else:
+                if commit is True:
+                    self.session.commit()
+                return result
 
-    return wrapper
+        return wrapper
+    return decorate
 
 
 class Database:
@@ -171,13 +174,13 @@ class Table:
         return self.bulk_insert_or_update(
             [item], unique_fields, update_fields)
 
-    @with_transaction
+    @with_transaction()
     def bulk_insert(self, data):
         if not data:
             return
         return self.session.execute(self.sal_table.insert(), data)
 
-    @with_transaction
+    @with_transaction()
     def bulk_delete(self, data, unique_fields):
         if not data:
             return
@@ -190,7 +193,7 @@ class Table:
         stmt = self.sal_table.delete().where(sal.and_(*cond_args))
         return self.session.execute(stmt, new_data)
 
-    @with_transaction
+    @with_transaction()
     def bulk_update(self, data, unique_fields, update_fields):
         if not data:
             return
@@ -217,7 +220,7 @@ class Table:
 
         return self.session.execute(stmt, new_data)
 
-    @with_transaction
+    @with_transaction()
     def bulk_insert_or_update(self, data, unique_fields, update_fields):
         if not data:
             return
@@ -397,17 +400,17 @@ class Query:
             conditions.append(column if asc else column.desc())
         return self._clone(query=self.query.order_by(*conditions))
 
-    @with_transaction
+    @with_transaction()
     def delete(self):
         return self.query.delete(synchronize_session=False)
 
-    @with_transaction
+    @with_transaction(commit=False)
     def __getattr__(self, item):
         if item in {'one', 'one_or_none', 'scalar', 'first', 'all'}:
             return getattr(self.query, item)
         raise AttributeError(item)
 
-    @with_transaction
+    @with_transaction(commit=False)
     def __iter__(self):
         return iter(self.query)
 

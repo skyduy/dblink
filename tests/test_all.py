@@ -1,6 +1,18 @@
-from unittest import TestCase
+import os
+from sqlalchemy.engine.url import make_url
+from unittest import TestCase as TestCaseBase
 from dblink import Database, Table
 from tests import create_table, drop_table
+
+
+DB_URL = 'sqlite:///:memory:'
+
+
+class TestCase(TestCaseBase):
+    def tearDown(self):
+        fn = make_url(DB_URL).database
+        if os.path.exists(fn):
+            os.remove(fn)
 
 
 class CoreTest(TestCase):
@@ -9,7 +21,7 @@ class CoreTest(TestCase):
         self.length = 100
 
     def test_A_insert(self):
-        with Database('sqlite:///:memory:') as db:
+        with Database(DB_URL) as db:
             create_table(db.engine)
             user_table = Table('users', db)
 
@@ -21,7 +33,7 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_B_update(self):
-        with Database('sqlite:///:memory:') as db:
+        with Database(DB_URL) as db:
             create_table(db.engine)
             user_table = Table('users', db)
 
@@ -36,7 +48,7 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_B_insert_or_update(self):
-        with Database('sqlite:///:memory:') as db:
+        with Database(DB_URL) as db:
             create_table(db.engine)
             user_table = Table('users', db)
 
@@ -55,7 +67,7 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_C_bulk_insert(self):
-        with Database('sqlite:///:memory:') as db:
+        with Database(DB_URL) as db:
             create_table(db.engine)
             user_table = Table('users', db)
 
@@ -73,7 +85,7 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_D_bulk_update(self):
-        with Database('sqlite:///:memory:') as db:
+        with Database(DB_URL) as db:
             create_table(db.engine)
             user_table = Table('users', db)
 
@@ -97,7 +109,7 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_E_bulk_update_or_insert(self):
-        with Database('sqlite:///:memory:') as db:
+        with Database(DB_URL) as db:
             create_table(db.engine)
             user_table = Table('users', db)
 
@@ -118,7 +130,7 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_F_delete(self):
-        with Database('sqlite:///:memory:') as db:
+        with Database(DB_URL) as db:
             create_table(db.engine)
             user_table = Table('users', db)
 
@@ -134,7 +146,7 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_G_bulk_delete(self):
-        with Database('sqlite:///:memory:') as db:
+        with Database(DB_URL) as db:
             create_table(db.engine)
             user_table = Table('users', db)
 
@@ -149,7 +161,7 @@ class CoreTest(TestCase):
             drop_table(db.engine)
 
     def test_H_get_or_insert(self):
-        with Database('sqlite:///:memory:') as db:
+        with Database(DB_URL) as db:
             create_table(db.engine)
             user_table = Table('users', db)
             data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
@@ -185,7 +197,7 @@ class QueryTest(TestCase):
     def setUp(self):
         self.maxDiff = None
         self.length = 100
-        self.db = Database('sqlite:///:memory:')
+        self.db = Database(DB_URL)
         create_table(self.db.engine)
         self.user_table = Table('users', self.db)
         self.address_table = Table('addresses', self.db)
@@ -196,6 +208,7 @@ class QueryTest(TestCase):
     def tearDown(self):
         self.db.close()
         drop_table(self.db.engine)
+        super().tearDown()
 
     def test_A_filter(self):
         all_user = self.user_table.query.filter(id__in=[1, 2]).all()
