@@ -28,8 +28,11 @@ def with_transaction(f):
         try:
             result = f(self, *args, **kwargs)
         except DBAPIError as e:
-            logger.error(e)
+            msg = ' '.join(['{}']*len(e.args)).format(*e.args)
+            logger.error(msg)
             self.session.rollback()
+            e.statement = str(e.statement)[:300]
+            e.params = str(e.params)[:300]
             raise
         else:
             self.session.commit()
