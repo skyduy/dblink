@@ -2,6 +2,9 @@ import collections
 import logging
 import sqlalchemy as sal
 from functools import wraps
+from datetime import date
+from dateutil.parser import parse as str2datetime
+from sqlalchemy.sql import sqltypes
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.sql.expression import bindparam
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -225,31 +228,36 @@ class Table:
         if not data:
             return
         unique_fields, update_fields = set(unique_fields), set(update_fields)
-        if (unique_fields | update_fields) - {c.name for c in self.c}:
+
+        field2type = {c.name: c.type for c in self.c}
+        if (unique_fields | update_fields) - field2type.keys():
             raise ValueError('Fields contain invalid column')
 
-        unique_fields = list(unique_fields)
-        unique_keys = {tuple(item[unique] for unique in unique_fields)
-                       for item in data}
-        query = dict(zip(["{}__in".format(u) for u in unique_fields],
-                         (set(i) for i in zip(*unique_keys))))
+        unique_fields, update_fields = list(unique_fields), list(update_fields)
 
-        exists = set()
+        unique2data = dict()
+        for item in data:
+            tmp = list()
+            for field in unique_fields:
+                value = item[field]
+                if isinstance(field2type[field], sqltypes.DATE):
+                    value = value if isinstance(value, date) else \
+                        str2datetime(value).date()
+                tmp.append(value)
+            unique2data[tuple(tmp)] = item
+
+        query = dict(zip(["{}__in".format(u) for u in unique_fields],
+                         (set(i) for i in zip(*unique2data.keys()))))
+
+        update_data = []
         for d in self.query.filter(**query):
             key = tuple(getattr(d, u) for u in unique_fields)
-            if key in unique_keys:
-                exists.add(key)
-
-        update_data, create_data = [], []
-        for item in data:
-            key = tuple(item[u] for u in unique_fields)
-            if key in exists:
-                update_data.append(item)
-            else:
-                create_data.append(item)
-
+            if key in unique2data:
+                update_data.append(unique2data.pop(key))
+        create_data = list(unique2data.values())
         self.bulk_insert(create_data)
-        self.bulk_update(update_data, unique_fields, update_fields)
+        if set(unique_fields) != set(update_fields):
+            self.bulk_update(update_data, unique_fields, update_fields)
 
     @property
     def c(self):

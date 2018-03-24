@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey
-from sqlalchemy.types import String, Integer
+from sqlalchemy.types import String, Integer, Date
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -24,6 +24,13 @@ class Address(Base):
     email_address = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship("User", back_populates="addresses")
+
+
+class BirthInfo(Base):
+    __tablename__ = 'birth_info'
+
+    user_id = Column(Integer, primary_key=True)
+    birthday = Column(Date, primary_key=True)
 
 
 def create_table(engine):

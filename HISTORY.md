@@ -1,3 +1,6 @@
+## V0.1.4 (2018/03/24)
+ - Bug fix.
+
 ## V0.1.3 (2018/02/07)
  - Improve Error tips.
  - Bug fix: Error closing cursor when operation on local sqlite db.

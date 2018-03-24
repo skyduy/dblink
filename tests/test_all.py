@@ -1,10 +1,12 @@
 import os
-from sqlalchemy.engine.url import make_url
+from dateutil.parser import parse
+from sqlalchemy import create_engine
 from unittest import TestCase as TestCaseBase
 from dblink import Database, Table
+from sqlalchemy.engine.url import make_url
 from tests import create_table, drop_table
 
-
+# DB_URL = 'postgresql+psycopg2://user:psw@host:port/db_name'
 DB_URL = 'sqlite:///:memory:'
 
 
@@ -19,10 +21,16 @@ class CoreTest(TestCase):
     def setUp(self):
         self.maxDiff = None
         self.length = 100
+        self.engine = create_engine(DB_URL)
+        create_table(self.engine)
+
+    def tearDown(self):
+        drop_table(self.engine)
+        super().tearDown()
 
     def test_A_insert(self):
         with Database(DB_URL) as db:
-            create_table(db.engine)
+            create_table(db.engine)  # For memory sqlite test
             user_table = Table('users', db)
 
             data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
@@ -30,11 +38,10 @@ class CoreTest(TestCase):
             result = user_table.query.one()
             answer = {c: getattr(result, c) for c in data.keys()}
             self.assertEqual(answer, data)
-            drop_table(db.engine)
 
     def test_B_update(self):
         with Database(DB_URL) as db:
-            create_table(db.engine)
+            create_table(db.engine)  # For memory sqlite test
             user_table = Table('users', db)
 
             data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
@@ -45,11 +52,10 @@ class CoreTest(TestCase):
             result = user_table.query.one()
             answer = {c: getattr(result, c) for c in right.keys()}
             self.assertEqual(answer, right)
-            drop_table(db.engine)
 
     def test_B_insert_or_update(self):
         with Database(DB_URL) as db:
-            create_table(db.engine)
+            create_table(db.engine)  # For memory sqlite test
             user_table = Table('users', db)
 
             data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
@@ -64,11 +70,10 @@ class CoreTest(TestCase):
             right = {'id': 1, 'name': 'n', 'fullname': 'f1', 'password': 'p'}
             answer = {c: getattr(result, c) for c in right.keys()}
             self.assertEqual(answer, right)
-            drop_table(db.engine)
 
     def test_C_bulk_insert(self):
         with Database(DB_URL) as db:
-            create_table(db.engine)
+            create_table(db.engine)  # For memory sqlite test
             user_table = Table('users', db)
 
             data = [
@@ -82,11 +87,10 @@ class CoreTest(TestCase):
             ], key=lambda x: x['id'])
             right = sorted(data, key=lambda x: x['id'])
             self.assertEqual(answer, right)
-            drop_table(db.engine)
 
     def test_D_bulk_update(self):
         with Database(DB_URL) as db:
-            create_table(db.engine)
+            create_table(db.engine)  # For memory sqlite test
             user_table = Table('users', db)
 
             data = [
@@ -106,11 +110,10 @@ class CoreTest(TestCase):
             ], key=lambda x: x['id'])
             right = sorted(data2, key=lambda x: x['id'])
             self.assertEqual(answer, right)
-            drop_table(db.engine)
 
     def test_E_bulk_update_or_insert(self):
         with Database(DB_URL) as db:
-            create_table(db.engine)
+            create_table(db.engine)  # For memory sqlite test
             user_table = Table('users', db)
 
             data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
@@ -127,11 +130,10 @@ class CoreTest(TestCase):
             ], key=lambda x: x['id'])
             right = sorted(data2, key=lambda x: x['id'])
             self.assertEqual(answer, right)
-            drop_table(db.engine)
 
     def test_F_delete(self):
         with Database(DB_URL) as db:
-            create_table(db.engine)
+            create_table(db.engine)  # For memory sqlite test
             user_table = Table('users', db)
 
             data = [
@@ -143,11 +145,10 @@ class CoreTest(TestCase):
             result = user_table.query.one()
             answer = {c: getattr(result, c) for c in data[1].keys()}
             self.assertEqual(answer, data[1])
-            drop_table(db.engine)
 
     def test_G_bulk_delete(self):
         with Database(DB_URL) as db:
-            create_table(db.engine)
+            create_table(db.engine)  # For memory sqlite test
             user_table = Table('users', db)
 
             data = [
@@ -158,11 +159,10 @@ class CoreTest(TestCase):
             user_table.bulk_delete(data, unique_fields=['id'])
             answer = user_table.query.one_or_none()
             self.assertEqual(answer, None)
-            drop_table(db.engine)
 
     def test_H_get_or_insert(self):
         with Database(DB_URL) as db:
-            create_table(db.engine)
+            create_table(db.engine)  # For memory sqlite test
             user_table = Table('users', db)
             data = {'id': 1, 'name': 'n1', 'fullname': 'f1', 'password': 'p1'}
             result1, flag = user_table.get_or_insert(**data)
@@ -176,7 +176,30 @@ class CoreTest(TestCase):
             answer = {c: getattr(result, c) for c in data.keys()}
             self.assertEqual(flag, False)
             self.assertEqual(answer, data)
-            drop_table(db.engine)
+
+    def test_I_bulk_update_or_insert_with_datetime(self):
+
+        with Database(DB_URL) as db:
+            create_table(db.engine)  # For memory sqlite test
+            birth_info_table = Table('birth_info', db)
+
+            def _(str_date):
+                if db.dialect == 'sqlite':
+                    return parse(str_date).date()
+                else:
+                    return str_date
+            data = {'user_id': 1, 'birthday': _('2010-01-01')}
+            birth_info_table.insert(data)
+            data2 = [
+                {'user_id': 1, 'birthday': _('2010-01-01')},
+                {'user_id': 2, 'birthday': _('2010-01-02')}
+            ]
+            birth_info_table.bulk_insert_or_update(
+                data2, ['user_id', 'birthday'], ['user_id', 'birthday'])
+
+            results = set(birth_info_table.query
+                          .values_list('user_id', flat=True))
+            self.assertEqual(results, {1, 2})
 
 
 class QueryTest(TestCase):
@@ -222,8 +245,8 @@ class QueryTest(TestCase):
         self.assertEqual(tuple(answer), (1, 'n1'))
 
     def test_D_values_list(self):
-        answer = self.user_table.query.filter(id__gte=1) \
-                                .values_list('id', 'name')
+        answer = self.user_table.query\
+            .filter(id__gte=1).values_list('id', 'name')
         self.assertEqual(sorted(answer),
                          [(1, 'n1'), (2, 'n2')])
 
@@ -247,11 +270,13 @@ class QueryTest(TestCase):
         self.assertEqual(sorted(answer), right)
 
     def test_F_delete(self):
-        items = self.user_table.query.filter(id=1)
+        items = self.address_table.query.filter(id=1)
         delete_count = items.delete()
         self.assertEqual(delete_count, 1)
-        self.assertEqual(self.user_table.query.all(),
-                         [(2, 'n2', 'f2', 'p2')])
+        result = list(self.address_table.query.order_by('-id')
+                      .values_list('id', flat=True))
+
+        self.assertEqual(result, [4, 3, 2])
 
     def test_G_order_by(self):
         answer = self.user_table.query.order_by('-id') \
@@ -271,5 +296,6 @@ class QueryTest(TestCase):
         self.assertEqual(result, [(2, 'n2', 'f2', 'p2')])
 
     def test_others(self):
-        print(self.user_table.description)
-        self.assertEqual(self.db.dialect, 'sqlite')
+        dialect = make_url(DB_URL).get_dialect().name
+        self.assertEqual(self.db.dialect, dialect)
+        self.assertIn("Table('users',", self.user_table.description)

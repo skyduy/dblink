@@ -12,7 +12,7 @@ def read(fn):
 
 setup(
     name='dblink',
-    version='0.1.3',
+    version='0.1.4',
     description='DBLink tools makes operation on exists table easier.',
     long_description=read('README.md') + '\n\n' + read('HISTORY.md'),
     author='skyduy',
@@ -24,9 +24,10 @@ setup(
     packages=find_packages(exclude=['tests']),
     install_requires=[
         'sqlalchemy==1.2.2',
+        'python-dateutil==2.6.0',
     ],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: MIT License',
