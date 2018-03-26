@@ -1,5 +1,5 @@
 
-## V0.1.6 (2018/03/24)
+## V0.2.0 (2018/03/24)
 
 - Bug fix.
   - Error closing cursor when operation on local sqlite db.

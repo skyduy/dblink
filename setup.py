@@ -19,7 +19,7 @@ def get_long_description():
 
 setup(
     name='dblink',
-    version='0.1.6',
+    version='0.2.0',
     description='DBLink tools makes operation on exists table easier.',
     author='skyduy',
     author_email='cuteuy@gmail.com',
