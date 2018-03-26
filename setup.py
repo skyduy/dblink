@@ -7,18 +7,20 @@ def get_long_description():
             import pypandoc
             long_description = pypandoc.convert_file(fn, 'rst')
         except(IOError, ImportError):
-            long_description = open(fn).read()
+            try:
+                long_description = open(fn).read()
+            except Exception:
+                long_description = ''
         except Exception:
             long_description = ''
         return long_description
-    return '\n\n\n'.join(read(f) for f in ('README.md', 'HISTORY.md'))
+    return '\n\n'.join(read(f) for f in ('README.md', 'HISTORY.md'))
 
 
 setup(
     name='dblink',
-    version='0.1.5',
+    version='0.1.6',
     description='DBLink tools makes operation on exists table easier.',
-    long_description=get_long_description(),
     author='skyduy',
     author_email='cuteuy@gmail.com',
     url='https://github.com/skyduy/dblink',
@@ -30,8 +32,12 @@ setup(
         'sqlalchemy==1.2.2',
         'python-dateutil==2.6.0',
     ],
+    data_files=[
+        ('./', ['HISTORY.md', 'README.md'])
+    ],
+    long_description=get_long_description(),
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
         'License :: OSI Approved :: MIT License',
