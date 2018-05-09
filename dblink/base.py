@@ -48,8 +48,9 @@ def with_transaction(commit=True):
 
 
 class Database:
-    def __init__(self, url):
-        self.__engine = sal.create_engine(url, pool_pre_ping=True)
+    def __init__(self, url, encoding='utf8'):
+        self.__engine = sal.create_engine(
+            url, encoding=encoding, pool_pre_ping=True)
         self.__metadata = sal.MetaData(bind=self.__engine)
         self.__session = scoped_session(sessionmaker(
             autocommit=False, autoflush=True, bind=self.__engine))()

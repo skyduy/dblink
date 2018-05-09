@@ -19,7 +19,7 @@ def get_long_description():
 
 setup(
     name='dblink',
-    version='0.2.0',
+    version='0.2.1',
     description='DBLink tools makes operation on exists table easier.',
     author='skyduy',
     author_email='cuteuy@gmail.com',
@@ -28,10 +28,6 @@ setup(
     keywords='sql orm dblink',
     test_suite="tests",
     packages=find_packages(exclude=['tests']),
-    install_requires=[
-        'sqlalchemy==1.2.2',
-        'python-dateutil==2.6.0',
-    ],
     data_files=[
         ('./', ['HISTORY.md', 'README.md'])
     ],

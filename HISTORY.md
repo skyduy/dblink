@@ -1,3 +1,7 @@
+## V0.2.1 (2018/05/09)
+
+- Add encoding option.
+- Improve package dependence.
 
 ## V0.2.0 (2018/03/24)
 
