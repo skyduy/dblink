@@ -188,6 +188,7 @@ class CoreTest(TestCase):
                     return parse(str_date).date()
                 else:
                     return str_date
+
             data = {'user_id': 1, 'birthday': _('2010-01-01')}
             birth_info_table.insert(data)
             data2 = [
@@ -245,7 +246,7 @@ class QueryTest(TestCase):
         self.assertEqual(tuple(answer), (1, 'n1'))
 
     def test_D_values_list(self):
-        answer = self.user_table.query\
+        answer = self.user_table.query \
             .filter(id__gte=1).values_list('id', 'name')
         self.assertEqual(sorted(answer),
                          [(1, 'n1'), (2, 'n2')])
@@ -280,15 +281,15 @@ class QueryTest(TestCase):
 
     def test_G_order_by(self):
         answer = self.user_table.query.order_by('-id') \
-                                      .values_list('id', 'name')
+            .values_list('id', 'name')
         self.assertEqual(list(answer), [(2, 'n2'), (1, 'n1')])
 
     def test_H_distinct(self):
         answer = self.address_table.query.distinct('user_id') \
-                                         .values_list('user_id', flat=True)
+            .values_list('user_id', flat=True)
         self.assertEqual(sorted(answer), [1, 2])
         answer = self.address_table \
-                     .query.values_list('user_id', distinct=True, flat=True)
+            .query.values_list('user_id', distinct=True, flat=True)
         self.assertEqual(sorted(answer), [1, 2])
 
     def test_I_text_query(self):

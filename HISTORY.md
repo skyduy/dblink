@@ -1,3 +1,6 @@
+## V0.2.2 (2019/09/08)
+- Update requirements for security.
+
 ## V0.2.1 (2018/05/09)
 
 - Add encoding option.

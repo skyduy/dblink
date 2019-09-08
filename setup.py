@@ -1,3 +1,4 @@
+import dblink
 from setuptools import setup, find_packages
 
 
@@ -19,7 +20,7 @@ def get_long_description():
 
 setup(
     name='dblink',
-    version='0.2.1',
+    version=dblink.__version__,
     description='DBLink tools makes operation on exists table easier.',
     author='skyduy',
     author_email='cuteuy@gmail.com',
@@ -40,5 +41,6 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 )
