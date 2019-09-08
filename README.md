@@ -111,8 +111,9 @@ with Database('sqlite:///:memory:') as db:
 ```
 
 ## History
-### V0.2.2 (2019/09/08)
+### V0.3.0 (2019/09/08)
 - Update requirements for security.
+- Fix the installation bugs on windows.
 
 ### V0.2.1 (2018/05/09)
 

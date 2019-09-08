@@ -15,9 +15,6 @@ setup(
     keywords='sql orm dblink',
     test_suite="tests",
     packages=find_packages(exclude=['tests']),
-    data_files=[
-        ('./', ['README.md'])
-    ],
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
