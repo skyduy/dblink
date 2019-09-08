@@ -1,22 +1,8 @@
 import dblink
 from setuptools import setup, find_packages
 
-
-def get_long_description():
-    def read(fn):
-        try:
-            import pypandoc
-            long_description = pypandoc.convert_file(fn, 'rst')
-        except(IOError, ImportError):
-            try:
-                long_description = open(fn).read()
-            except Exception:
-                long_description = ''
-        except Exception:
-            long_description = ''
-        return long_description
-    return '\n\n'.join(read(f) for f in ('README.md', 'HISTORY.md'))
-
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 setup(
     name='dblink',
@@ -30,9 +16,10 @@ setup(
     test_suite="tests",
     packages=find_packages(exclude=['tests']),
     data_files=[
-        ('./', ['HISTORY.md', 'README.md'])
+        ('./', ['README.md'])
     ],
-    long_description=get_long_description(),
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

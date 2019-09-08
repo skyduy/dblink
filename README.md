@@ -2,10 +2,10 @@
 
 [![PyPI version](https://badge.fury.io/py/dblink.svg)](https://badge.fury.io/py/dblink)
 [![Build Status](https://travis-ci.org/skyduy/dblink.svg?branch=master)](https://travis-ci.org/skyduy/dblink)
-[![codecov](https://codecov.io/gh/skyduy/dblink/branch/master/graph/badge.svg)](https://codecov.io/gh/skyduy/dblink)
 
 > Aimed for easily using query, insert, update and delete with an exist table, the filter query syntax likes Django's. You can find out the simple usage in the code below.
 
+## Introduction
 Suppose you have two tables: `users` and `addresses` created by:
 
 ```sql
@@ -109,3 +109,24 @@ with Database('sqlite:///:memory:') as db:
     table_user.bulk_update(items, unique_fields, update_fields)
     table_user.bulk_insert_or_update(items, unique_fields, update_fields)
 ```
+
+## History
+### V0.2.2 (2019/09/08)
+- Update requirements for security.
+
+### V0.2.1 (2018/05/09)
+
+- Add encoding option.
+- Improve package dependence.
+
+### V0.2.0 (2018/03/24)
+
+- Bug fix.
+  - Error closing cursor when operation on local sqlite db.
+  - Bugs in bulk_insert_or_update.
+
+- Improve Error tips.
+
+### V0.1.2 (2018/02/05)
+
+- Initial release.
